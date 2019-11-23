@@ -9,6 +9,6 @@
 
 Author: Tomáš Pásler - github.com/pasleto
 
-Destop application for **Home Assistant** available for Windows and MacOS.
+Desktop application for **Home Assistant** available for Windows and MacOS.
 
 ---
