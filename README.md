@@ -12,3 +12,13 @@ Author: Tomáš Pásler - github.com/pasleto
 Desktop application for **Home Assistant** available for Windows and MacOS.
 
 ---
+
+## Preview
+
+![](/screenshots/Preview1.png)
+
+![](/screenshots/Preview2.png)
+
+![](/screenshots/Preview3.png)
+
+---
