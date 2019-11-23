@@ -11,6 +11,12 @@ Author: Tomáš Pásler - github.com/pasleto
 
 Desktop application for **Home Assistant** available for Windows and MacOS.
 
+Features:
+  - Local URL
+  - Remote URL
+  - Tray Icon
+  - Start at login
+
 ---
 
 ## Preview
