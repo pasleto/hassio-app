@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>About</title>
+    <style>
+        body {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+        }
+        .title {
+            margin: 0;
+            padding: 0;
+            padding-bottom: 5px;
+        }
+        .subtitle {
+            margin: 0;
+            padding: 0;
+            padding-bottom: 10px;
+        }
+        .container {
+            width: 60%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .container--img {
+            width: 40%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .logo {
+            margin-top: 1px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .version {
+            font-size: 12px;
+        }
+        .maincontainer {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-content: center;
+            width: 85%;
+            height: 75%;
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .buttoncontainer {
+            display: flex;
+            width: 100%;
+            padding-bottom: 20px;
+            flex-direction: row;
+            justify-content: center;
+            align-content: center;
+            align-items: center;
+        }
+        .buttoncontainer input {
+            line-height: 20px;
+            font-size: 18px;
+        }
+        .subcontainer {
+            display: flex;
+            width: 100%;
+            margin-top: -30px;
+            padding-bottom: 15px;
+            flex-direction: row;
+            justify-content: center;
+            align-content: center;
+            align-items: center;
+        }
+        .github {
+            cursor: pointer;
+            font-style: italic;
+        }
+        .github:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="maincontainer">
+        <div class="container--img">
+            <img draggable="false" class="logo" src="assets/icon.png" width="60px">
+        </div>
+        <div class="container">
+            <h3 class="title">Home Assistant</h3>
+            <h5 class="subtitle">Desktop Application</h5>
+            <span class="version">Version: <span id="appVersion"></span></span>
+        </div>
+    </div>
+    <div class="subcontainer">
+        <span class="github" onclick="openLink()">github.com/pasleto/hassio-app</span>
+    </div>
+    <div class="buttoncontainer">
+        <input type="button" value="Close" onclick="window.close()">
+    </div>
+    <script>
+        const electron = require('electron');
+        const {ipcRenderer} = electron;
+
+        ipcRenderer.on('about:version', function(e,value){
+            let span = document.querySelector('#appVersion');
+            span.innerHTML = '&nbsp;' + value;
+        });
+
+        ipcRenderer.on('app:is:mac:dark', function(e,value){
+            if(value){
+                let body = document.querySelector('body');
+                body.style.color = "white";
+            }
+        });
+
+        function openLink() {
+            ipcRenderer.send('app:about:github', 'https://github.com/pasleto/hassio-app');
+        };
+    </script>
+</body>
+</html>

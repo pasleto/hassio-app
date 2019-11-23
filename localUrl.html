@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Home Assistant - Local URL</title>
+    <style>
+        body {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .title {
+            margin: 0;
+            padding: 0;
+            padding-bottom: 20px;
+        }
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .subContainer {
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+            display: flex;
+            flex-direction: row;
+            align-content: center;
+            justify-content: space-around;
+            text-align: center;
+            padding-top: 15px;
+            padding-bottom: 10px;
+        }
+        .textBar {
+            width: 80%;
+            line-height: 20px;
+            font-size: 18px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .button {
+            font-size: 18px;
+            padding-left: 5px;
+            padding-right: 5px;
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h4 class="title">Change Home Assistant Local URL:</h4>
+        <form>
+            <input required id="textBar" type="text" class="textBar">
+            <div class="subContainer">
+                <input class="button" type="button" value="Cancel" onclick="window.close()">
+                <input class="button" type="submit" value="Save">
+            </div>
+        </form>
+    </div>
+    <script>
+        const electron = require('electron');
+        const {ipcRenderer} = electron;
+
+        const form = document.querySelector('form');
+        form.addEventListener('submit', submitForm);
+
+        function submitForm(e) {
+            e.preventDefault();
+            const value = document.querySelector('#textBar').value;
+            ipcRenderer.send('local:url:set', value)
+        }
+
+        ipcRenderer.on('local:url:get', function(e,value){
+            let text = document.querySelector('#textBar');
+            text.value = value;
+        });
+
+        ipcRenderer.on('app:is:mac:dark', function(e,value){
+            if(value){
+                let body = document.querySelector('body');
+                body.style.color = "white";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Home Assistant Start Options</title>
+    <style>
+        body {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+        }
+        .title {
+            margin: 0;
+            padding: 0;
+            width: 91%;
+            text-align: left;
+            padding-left: 5px;
+        }
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .subcontainer {
+            width: 75%;
+            display: flex;
+            flex-direction: row;
+            align-content: center;
+            justify-content: center;
+            text-align: center;
+            padding-bottom: 10px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .subcontainer--title {
+            width: 75%;
+            display: flex;
+            flex-direction: row;
+            align-content: center;
+            justify-content: space-around;
+            text-align: center;
+            padding-bottom: 20px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .button {
+            font-size: 18px;
+            width: 9%;
+            height: 20px;
+            margin-top: 1px;
+        }
+        #logo {
+            width: 30px;
+            height: 30px;
+            margin-top: 2px;
+        }
+        #title {
+            margin: 0;
+            padding: 0;
+            margin-top: 5px;
+        }
+        .buttoncontainer {
+            padding-top: 10px;
+        }
+        .buttoncontainer input {
+            line-height: 20px;
+            font-size: 18px;
+        }
+        .subcontainer--restart {
+            display: flex;
+            flex-direction: row;
+            padding-top: 5px;
+            width: 70%;
+            align-content: center;
+            align-items: center;
+            text-align: center;
+            justify-content: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .restart {
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="subcontainer--title">
+            <img draggable="false" src="assets/icon.png" id="logo">
+            <h3 id="title">Start Options:</h3>
+        </div>
+        <div class="subcontainer">
+            <label class="title">Start at Remote URL:</label>
+            <input id="remotePrefer" class="button" type="checkbox" onclick="checkStartRemoteButton()">
+        </div>
+        <div class="subcontainer">
+            <label class="title">Start Maximized:</label>
+            <input id="maximizedPrefer" class="button" type="checkbox" onclick="checkStartMaximizedButton()">
+        </div>
+        <div class="subcontainer">
+            <label class="title">Hide to Tray Icon:</label>
+            <input id="trayPrefer" class="button" type="checkbox" onclick="checkHideTrayButton()">
+        </div>
+        <div class="subcontainer">
+            <label class="title">Start at login:</label>
+            <input id="startLogin" class="button" type="checkbox" onclick="checkStartLoginButton()">
+        </div>
+        <div class="subcontainer">
+            <label class="title">Start hidden:</label>
+            <input disabled id="startHidden" class="button" type="checkbox" onclick="checkStartHiddenButton()">
+        </div>
+        <div class="subcontainer--restart">
+            <label class="restart">If changes occur, the application will restart automatically</label>
+        </div>
+        <div class="buttoncontainer">
+            <input type="button" value="Close" onclick="restartApp()">
+        </div>
+    </div>
+    <script>
+        const electron = require('electron');
+        const {ipcRenderer} = electron;
+        let preferTrayCheckInit, preferMaximizedCheckInit, preferRemoteCheckInit, startLoginCheckInit, startHiddenCheckInit;
+
+        ipcRenderer.on('app:settings:startMaximized', function(e,value){
+            document.getElementById('maximizedPrefer').checked = value;
+            preferMaximizedCheckInit = value;
+        });
+
+        ipcRenderer.on('app:settings:startRemote', function(e,value){
+            document.getElementById('remotePrefer').checked = value;
+            preferRemoteCheckInit = value;
+        });
+
+        ipcRenderer.on('app:settings:hideTray', function(e,value){
+            document.getElementById('trayPrefer').checked = value;
+            preferTrayCheckInit = value;
+        });
+
+        ipcRenderer.on('app:settings:startLogin', function(e,value){
+            document.getElementById('startLogin').checked = value;
+            startLoginCheckInit = value;
+            if(value){
+                document.getElementById('startHidden').disabled = false;
+            }
+        });
+
+        ipcRenderer.on('app:settings:startHidden', function(e,value){
+            document.getElementById('startHidden').checked = value;
+            startHiddenCheckInit = value;
+        });
+
+        ipcRenderer.on('app:is:mac:dark', function(e,value){
+            if(value){
+                let body = document.querySelector('body');
+                body.style.color = "white";
+            }
+        });
+
+        // function checkStartHiddenButtonAtOpen() {
+        //     var startLoginCheckbox = document.getElementById('startLogin');
+        //     var startHiddenCheckbox = document.getElementById('startHidden');
+        //     if (startLoginCheckbox.checked != true) {
+        //         startHiddenCheckbox.disabled = true;
+        //         startHiddenCheckbox.checked = false;
+        //     } else {
+        //         startHiddenCheckbox.disabled = false;
+        //     }
+        // };
+
+        // checkStartHiddenButtonAtOpen();
+
+        function checkStartMaximizedButton() {
+            var startMaximizedCheckbox = document.getElementById('maximizedPrefer');
+            if (startMaximizedCheckbox.checked != true) {
+                ipcRenderer.send('app:settings:startMaximized:false');
+            } else {
+                ipcRenderer.send('app:settings:startMaximized:true');
+            }
+        };
+
+        function checkStartRemoteButton() {
+            var startRemoteCheckbox = document.getElementById('remotePrefer');
+            if (startRemoteCheckbox.checked != true) {
+                ipcRenderer.send('app:settings:startRemote:false');
+            } else {
+                ipcRenderer.send('app:settings:startRemote:true');
+            }
+        };
+
+        function checkHideTrayButton() {
+            var hideTrayCheckbox = document.getElementById('trayPrefer');
+            if (hideTrayCheckbox.checked != true) {
+                ipcRenderer.send('app:settings:hideTray:false');
+            } else {
+                ipcRenderer.send('app:settings:hideTray:true');
+            }
+        };
+
+        function checkStartLoginButton() {
+            var startLoginCheckbox = document.getElementById('startLogin');
+            if (startLoginCheckbox.checked != true) {
+                document.getElementById('startHidden').disabled = true;
+                document.getElementById('startHidden').checked = false;
+                ipcRenderer.send('app:settings:startLogin:false');
+                ipcRenderer.send('app:settings:startHidden:false');
+            } else {
+                document.getElementById('startHidden').disabled = false;
+                ipcRenderer.send('app:settings:startLogin:true');
+            }
+        };
+
+        function checkStartHiddenButton() {
+            var startHiddenCheckbox = document.getElementById('startHidden');
+            if (startHiddenCheckbox.checked != true) {
+                ipcRenderer.send('app:settings:startHidden:false');
+            } else {
+                ipcRenderer.send('app:settings:startHidden:true');
+            }
+        };
+
+        function restartApp() {
+            var hideTrayCheckbox = document.getElementById('trayPrefer').checked;
+            var startRemoteCheckbox = document.getElementById('remotePrefer').checked;
+            var startMaximizedCheckbox = document.getElementById('maximizedPrefer').checked;
+            var startLoginCheckbox = document.getElementById('startLogin').checked;
+            var startHiddenCheckbox = document.getElementById('startHidden').checked;
+
+            if(hideTrayCheckbox === preferTrayCheckInit && startLoginCheckbox === startLoginCheckInit && startHiddenCheckbox === startHiddenCheckInit && startRemoteCheckbox === preferRemoteCheckInit && startMaximizedCheckbox === preferMaximizedCheckInit) {
+                window.close();
+            } else {
+                ipcRenderer.send('app:settings:app:restart');
+            }
+        }
+    </script>
+</body>
+</html>

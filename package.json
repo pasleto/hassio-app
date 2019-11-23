@@ -1,0 +1,47 @@
+{
+  "name": "hassio-app",
+  "productName": "Home Assistant",
+  "version": "0.2.3",
+  "description": "Desktop App for Home Assistant",
+  "main": "main.js",
+  "author": {
+    "name": "Tomáš Pásler",
+    "email": "tomas.pasler@gmail.com",
+    "url": "https://github.com/pasleto"
+  },
+  "build": {
+    "appId": "com.electron.hassio",
+    "productName": "Home Assistant",
+    "copyright": "Copyright © 2019 Tomáš Pásler",
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": "dmg",
+      "icon": "build/icon.icns",
+      "darkModeSupport": true
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    }
+  },
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pasleto/hassio-app"
+  },
+  "keywords": [
+    "Home Assistant",
+    "hassio",
+    "electron"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^7.1.1",
+    "electron-builder": "^21.2.0"
+  }
+}
