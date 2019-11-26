@@ -1,7 +1,7 @@
 {
   "name": "hassio-app",
   "productName": "Home Assistant",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "description": "Desktop App for Home Assistant",
   "main": "main.js",
   "author": {

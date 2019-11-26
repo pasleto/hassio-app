@@ -5,6 +5,8 @@ const isMac = process.platform === 'darwin';
 let mainWindow, localUrlWindow, remoteUrlWindow, aboutWindow, optionsWindow;
 const gotTheLock = app.requestSingleInstanceLock();
 
+if (app.dock) app.dock.hide(); 
+
 const store = new Store({
   configName: 'home-assistant-app-preferences',
   defaults: {
@@ -12,80 +14,10 @@ const store = new Store({
     startHidden: false,
     preferRemote: false,
     preferMaximized: false,
-    preferTray: false,
     localUrl: 'http://hassio.local:8123/',
     remoteUrl: 'http://hassio.local:8123/'
   }
 });
-
-const appMenu = Menu.buildFromTemplate([
-  ...(isMac ? [{
-    label: app.name,
-    submenu: [
-      { label: 'About ' + app.name, click: () => { (localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createAboutWindow() : null } },
-      { type: 'separator' },
-      { role: 'hide' },
-      { role: 'hideothers' },
-      { role: 'unhide' },
-      { type: 'separator' },
-      { role: 'quit' }
-    ]
-  }] : [
-    {
-      label: app.name,
-      submenu: [
-        { label: 'About ' + app.name, click: () => { (localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createAboutWindow() : null } },
-        { role: 'quit' }
-      ]
-    }
-  ]),
-  {
-    label: 'Connection',
-    submenu: [
-      { label: ' Connect to Local URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.loadURL(store.get('localUrl')) } },
-      { type: 'separator' },
-      { label: ' Connect to Remote URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.loadURL(store.get('remoteUrl')) } }
-    ]
-  },
-  {
-    label: 'View',
-    submenu: [
-      { role: 'reload' },
-      { role: 'forcereload' },
-      { type: 'separator' },
-      { role: 'toggledevtools' },
-      { type: 'separator' },
-      { role: 'resetzoom' },
-      { role: 'zoomin' },
-      { role: 'zoomout' },
-      { type: 'separator' },
-      { role: 'togglefullscreen' }
-    ]
-  },
-  {
-    label: 'Window',
-    submenu: [
-      { role: 'minimize' },
-      { label: 'Maximize / Unmaximize', click: () => { mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize() } }
-    ]
-  },
-  {
-    label: 'History',
-    submenu: [
-      { label: 'Go Back', click: () => { mainWindow.webContents.goBack() } },
-      { label: 'Go Forward', click: () => { mainWindow.webContents.goForward() } }
-    ]
-  },
-  { label: 'Settings',
-    submenu: [
-      { label: ' Start Options', icon: __dirname + '/assets/iconSmall.png', click: () => { (localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createOptionsWindow() : null } },
-      { type: 'separator' },
-      { label: ' Change Local URL', icon: __dirname + '/assets/iconSmall.png', click: () => { (localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createLocalUrlWindow() : null } },
-      { type: 'separator' },
-      { label: ' Change Remote URL', icon: __dirname + '/assets/iconSmall.png', click: () => { (localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createRemoteUrlWindow() : null } }
-    ]
-  }
-]);
 
 const homeAssistant = new TouchBarLabel();
 homeAssistant.label = app.name;
@@ -106,7 +38,7 @@ const remoteButton = new TouchBarButton({
 });
 
 const closeButton = new TouchBarButton({
-  label: store.get('preferTray') ? 'Close' : 'Quit',
+  label: 'Close',
   icon: __dirname + '/assets/iconSmall.png',
   iconPosition: 'left',
   click: () => { app.quit() }
@@ -135,8 +67,7 @@ const touchBar = new TouchBar({
   ]
 });
 
-function createMainWindow () {
-  if (app.dock && store.get('preferTray')) app.dock.hide();  
+function createMainWindow () { 
   tray = new Tray(__dirname + '/assets/iconSmall.png');
   tray.setToolTip('Home Assistant');
   mainWindow = new BrowserWindow({
@@ -147,12 +78,11 @@ function createMainWindow () {
     title: 'Home Assistant',
     icon: __dirname + '/assets/icon.ico',
     webPreferences: { nodeIntegration: true },
-    skipTaskbar: ((isMac) ? false : (store.get('preferTray') ? true : false)),
+    skipTaskbar: ((isMac) ? false : true),
     autoHideMenuBar: ((isMac) ? false : true),
-    minimizable: (store.get('preferTray') ? false : true),
+    minimizable: false,
     show: !store.get('startHidden')
   });
-  Menu.setApplicationMenu(appMenu);
   const contextMenuWin = Menu.buildFromTemplate([
     { label: ' Connect to: ', icon: __dirname + '/assets/iconSmall.png', submenu: [
       { label: ' Local URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.loadURL(store.get('localUrl')) } },
@@ -160,57 +90,70 @@ function createMainWindow () {
     ]},
     { type: 'separator' },
     { label: ' Settings', icon: __dirname + '/assets/iconSmall.png', submenu: [
-      { label: 'About ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { (localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createAboutWindow() : null } },
+      { label: 'About ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createAboutWindow() : null) : (mainWindow.show(),createAboutWindow()) } },
       { type: 'separator' },
-      { label: ' Start Options', icon: __dirname + '/assets/iconSmall.png', click: () => { (localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createOptionsWindow() : null } },
-      { label: ' Change Local URL', icon: __dirname + '/assets/iconSmall.png', click: () => { (localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createLocalUrlWindow() : null } },
-      { label: ' Change Remote URL', icon: __dirname + '/assets/iconSmall.png', click: () => { (localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createRemoteUrlWindow() : null } }
+      { label: ' Start Options', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createOptionsWindow() : null) : (mainWindow.show(),createOptionsWindow()) } },
+      { label: ' Change Local URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createLocalUrlWindow() : null) : (mainWindow.show(),createLocalUrlWindow()) } },
+      { label: ' Change Remote URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createRemoteUrlWindow() : null) : (mainWindow.show(),createRemoteUrlWindow()) } }
     ] },
     { type: 'separator' },
-    store.get('preferTray') ? { label: ' Show / Hide ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show() } } : { label: ' Minimize / Restore ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isMinimized() ? mainWindow.restore() : mainWindow.minimize() } },
+    { label: ' History', icon: __dirname + '/assets/iconSmall.png', submenu: [
+      { label: 'Go Back', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.webContents.goBack() } },
+      { label: 'Go Forward', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.webContents.goForward() } }
+    ] },
+    { type: 'separator' },
+    { label: ' Window', icon: __dirname + '/assets/iconSmall.png', submenu: [
+      { role: 'reload', icon: __dirname + '/assets/iconSmall.png' },
+      { role: 'forceReload', icon: __dirname + '/assets/iconSmall.png' },
+      { role: 'toggleDevTools', icon: __dirname + '/assets/iconSmall.png' }
+    ] },
+    { type: 'separator' },
+    { label: ' Show / Hide ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show() } },
     { type: 'separator' },
     { label: ' Quit ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.close() ;app.quit() } }
   ]);
   const contextMenuMac = Menu.buildFromTemplate([
-    store.get('preferTray') ? { label: ' Show / Hide ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show() } } : { label: ' Minimize / Restore ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isMinimized() ? mainWindow.restore() : mainWindow.minimize() } },
+    { label: ' Show / Hide ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show() } },
     { type: 'separator' },
     { label: ' Connect to: ', icon: __dirname + '/assets/iconSmall.png', submenu: [
       { label: ' Local URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.loadURL(store.get('localUrl')) } },
       { label: ' Remote URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.loadURL(store.get('remoteUrl')) } }
     ]},
     { type: 'separator' },
+    { label: ' Window', icon: __dirname + '/assets/iconSmall.png', submenu: [
+      { role: 'reload', icon: __dirname + '/assets/iconSmall.png' },
+      { role: 'forceReload', icon: __dirname + '/assets/iconSmall.png' },
+      { role: 'toggleDevTools', icon: __dirname + '/assets/iconSmall.png' }
+    ] },
+    { type: 'separator' },
+    { label: ' History', icon: __dirname + '/assets/iconSmall.png', submenu: [
+      { label: 'Go Back', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.webContents.goBack() } },
+      { label: 'Go Forward', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.webContents.goForward() } }
+    ] },
+    { type: 'separator' },
     { label: ' Settings', icon: __dirname + '/assets/iconSmall.png', submenu: [
-      { label: 'About ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { (localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createAboutWindow() : null } },
+      { label: 'About ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createAboutWindow() : null) : (mainWindow.show(),createAboutWindow()) } },
       { type: 'separator' },
-      { label: ' Start Options', icon: __dirname + '/assets/iconSmall.png', click: () => { (localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createOptionsWindow() : null } },
-      { label: ' Change Local URL', icon: __dirname + '/assets/iconSmall.png', click: () => { (localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createLocalUrlWindow() : null } },
-      { label: ' Change Remote URL', icon: __dirname + '/assets/iconSmall.png', click: () => { (localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createRemoteUrlWindow() : null } }
+      { label: ' Start Options', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createOptionsWindow() : null) : (mainWindow.show(),createOptionsWindow()) } },
+      { label: ' Change Local URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createLocalUrlWindow() : null) : (mainWindow.show(),createLocalUrlWindow()) } },
+      { label: ' Change Remote URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createRemoteUrlWindow() : null) : (mainWindow.show(),createRemoteUrlWindow()) } }
     ] },
     { type: 'separator' },
     { label: ' Quit ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.close(); app.quit() } }
   ]);
   mainWindow.loadURL(store.get('preferRemote') ? store.get('remoteUrl') : store.get('localUrl'));
+  store.get('preferMaximized') ? mainWindow.maximize() : null;
+  mainWindow.removeMenu();
   mainWindow.setTouchBar(touchBar);
-  mainWindow.webContents.on('did-finish-load', function() {
-      store.get('startHidden') ? (store.get('preferTray') ? mainWindow.hide() : mainWindow.minimize() ) : mainWindow.show();
-      store.get('preferMaximized') ? mainWindow.maximize() : null;
-  });
   tray.setIgnoreDoubleClickEvents(true);
   tray.on('click', () => {
-    if(store.get('preferTray')){
-      mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
-    } else {
-      mainWindow.isMinimized() ? mainWindow.restore() : mainWindow.minimize();
-    }
+    mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
   });
   tray.on('right-click', () => {
     tray.popUpContextMenu((isMac) ? contextMenuMac : contextMenuWin)
   });
-  mainWindow.on('minimize', () => {
-    store.get('preferTray') ? mainWindow.hide() : mainWindow.minimize();
-  })
   mainWindow.on('close', (e) => {
-    if(store.get('preferTray') && mainWindow.isVisible()) {
+    if(mainWindow.isVisible()) {
       e.preventDefault();
       mainWindow.hide();
     }
@@ -240,6 +183,7 @@ function createLocalUrlWindow () {
     localUrlWindow.show();
     localUrlWindow.webContents.send('local:url:get', store.get('localUrl'));
     localUrlWindow.webContents.send('app:is:mac:dark', (isMac && nativeTheme.shouldUseDarkColors));
+    localUrlWindow.focus();
   });
   localUrlWindow.on('closed', function () {
     localUrlWindow = null;
@@ -266,6 +210,7 @@ function createRemoteUrlWindow () {
     remoteUrlWindow.show();
     remoteUrlWindow.webContents.send('app:is:mac:dark', (isMac && nativeTheme.shouldUseDarkColors));
     remoteUrlWindow.webContents.send('remote:url:get', store.get('remoteUrl'));
+    remoteUrlWindow.focus();
   });
   remoteUrlWindow.on('closed', function () {
     remoteUrlWindow = null;
@@ -293,6 +238,7 @@ function createAboutWindow () {
     aboutWindow.show();
     aboutWindow.webContents.send('app:is:mac:dark', (isMac && nativeTheme.shouldUseDarkColors));
     aboutWindow.webContents.send('about:version', app.getVersion());
+    aboutWindow.focus();
   });
   aboutWindow.on('closed', function () {
     aboutWindow = null;
@@ -321,7 +267,6 @@ function createOptionsWindow () {
     optionsWindow.webContents.send('app:is:mac:dark', (isMac && nativeTheme.shouldUseDarkColors));
     optionsWindow.webContents.send('app:settings:startMaximized', store.get('preferMaximized'));
     optionsWindow.webContents.send('app:settings:startRemote', store.get('preferRemote'));
-    optionsWindow.webContents.send('app:settings:hideTray', store.get('preferTray'));
     optionsWindow.webContents.send('app:settings:startLogin', store.get('startLogin'));
     optionsWindow.webContents.send('app:settings:startHidden', store.get('startHidden'));
     optionsWindow.focus();
@@ -355,14 +300,6 @@ ipcMain.on('app:settings:startRemote:false', () => {
 
 ipcMain.on('app:settings:startRemote:true', () => {
   store.set('preferRemote', true);
-});
-
-ipcMain.on('app:settings:hideTray:false', () => {
-  store.set('preferTray', false);
-});
-
-ipcMain.on('app:settings:hideTray:true', () => {
-  store.set('preferTray', true);
 });
 
 ipcMain.on('app:settings:startLogin:false', () => {
@@ -416,3 +353,6 @@ app.on('window-all-closed', function () {
 app.on('activate', function () {
   if (mainWindow === null) createMainWindow();
 });
+
+
+//TODO try catch for load urls

@@ -111,16 +111,12 @@
             <input id="maximizedPrefer" class="button" type="checkbox" onclick="checkStartMaximizedButton()">
         </div>
         <div class="subcontainer">
-            <label class="title">Hide to Tray Icon:</label>
-            <input id="trayPrefer" class="button" type="checkbox" onclick="checkHideTrayButton()">
-        </div>
-        <div class="subcontainer">
             <label class="title">Start at login:</label>
             <input id="startLogin" class="button" type="checkbox" onclick="checkStartLoginButton()">
         </div>
         <div class="subcontainer">
             <label class="title">Start hidden:</label>
-            <input disabled id="startHidden" class="button" type="checkbox" onclick="checkStartHiddenButton()">
+            <input id="startHidden" class="button" type="checkbox" onclick="checkStartHiddenButton()">
         </div>
         <div class="subcontainer--restart">
             <label class="restart">If changes occur, the application will restart automatically</label>
@@ -132,7 +128,7 @@
     <script>
         const electron = require('electron');
         const {ipcRenderer} = electron;
-        let preferTrayCheckInit, preferMaximizedCheckInit, preferRemoteCheckInit, startLoginCheckInit, startHiddenCheckInit;
+        let preferMaximizedCheckInit, preferRemoteCheckInit, startLoginCheckInit, startHiddenCheckInit;
 
         ipcRenderer.on('app:settings:startMaximized', function(e,value){
             document.getElementById('maximizedPrefer').checked = value;
@@ -144,17 +140,9 @@
             preferRemoteCheckInit = value;
         });
 
-        ipcRenderer.on('app:settings:hideTray', function(e,value){
-            document.getElementById('trayPrefer').checked = value;
-            preferTrayCheckInit = value;
-        });
-
         ipcRenderer.on('app:settings:startLogin', function(e,value){
             document.getElementById('startLogin').checked = value;
             startLoginCheckInit = value;
-            if(value){
-                document.getElementById('startHidden').disabled = false;
-            }
         });
 
         ipcRenderer.on('app:settings:startHidden', function(e,value){
@@ -168,19 +156,6 @@
                 body.style.color = "white";
             }
         });
-
-        // function checkStartHiddenButtonAtOpen() {
-        //     var startLoginCheckbox = document.getElementById('startLogin');
-        //     var startHiddenCheckbox = document.getElementById('startHidden');
-        //     if (startLoginCheckbox.checked != true) {
-        //         startHiddenCheckbox.disabled = true;
-        //         startHiddenCheckbox.checked = false;
-        //     } else {
-        //         startHiddenCheckbox.disabled = false;
-        //     }
-        // };
-
-        // checkStartHiddenButtonAtOpen();
 
         function checkStartMaximizedButton() {
             var startMaximizedCheckbox = document.getElementById('maximizedPrefer');
@@ -200,24 +175,11 @@
             }
         };
 
-        function checkHideTrayButton() {
-            var hideTrayCheckbox = document.getElementById('trayPrefer');
-            if (hideTrayCheckbox.checked != true) {
-                ipcRenderer.send('app:settings:hideTray:false');
-            } else {
-                ipcRenderer.send('app:settings:hideTray:true');
-            }
-        };
-
         function checkStartLoginButton() {
             var startLoginCheckbox = document.getElementById('startLogin');
             if (startLoginCheckbox.checked != true) {
-                document.getElementById('startHidden').disabled = true;
-                document.getElementById('startHidden').checked = false;
                 ipcRenderer.send('app:settings:startLogin:false');
-                ipcRenderer.send('app:settings:startHidden:false');
             } else {
-                document.getElementById('startHidden').disabled = false;
                 ipcRenderer.send('app:settings:startLogin:true');
             }
         };
@@ -232,13 +194,12 @@
         };
 
         function restartApp() {
-            var hideTrayCheckbox = document.getElementById('trayPrefer').checked;
             var startRemoteCheckbox = document.getElementById('remotePrefer').checked;
             var startMaximizedCheckbox = document.getElementById('maximizedPrefer').checked;
             var startLoginCheckbox = document.getElementById('startLogin').checked;
             var startHiddenCheckbox = document.getElementById('startHidden').checked;
 
-            if(hideTrayCheckbox === preferTrayCheckInit && startLoginCheckbox === startLoginCheckInit && startHiddenCheckbox === startHiddenCheckInit && startRemoteCheckbox === preferRemoteCheckInit && startMaximizedCheckbox === preferMaximizedCheckInit) {
+            if(startLoginCheckbox === startLoginCheckInit && startHiddenCheckbox === startHiddenCheckInit && startRemoteCheckbox === preferRemoteCheckInit && startMaximizedCheckbox === preferMaximizedCheckInit) {
                 window.close();
             } else {
                 ipcRenderer.send('app:settings:app:restart');
