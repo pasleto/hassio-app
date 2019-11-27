@@ -142,9 +142,6 @@ function createMainWindow () {
     { label: ' Quit ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.close(); app.quit() } }
   ]);
   mainWindow.loadURL(store.get('preferRemote') ? store.get('remoteUrl') : store.get('localUrl'));
-  // store.get('preferMaximized') ? mainWindow.maximize() : null;
-  // store.get('preferMaximized') ? (store.get('startHidden') ? (mainWindow.maximize(),mainWindow.hide()) : mainWindow.maximize()) : null;
-  // store.get('startHidden') ? mainWindow.hide() : mainWindow.show();
   if(!store.get('startHidden') && store.get('preferMaximized')) {
     mainWindow.maximize();
     mainWindow.show();
@@ -156,7 +153,6 @@ function createMainWindow () {
   mainWindow.setTouchBar(touchBar);
   tray.setIgnoreDoubleClickEvents(true);
   tray.on('click', () => {
-    // mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
     if(mainWindow.isVisible()) {
       mainWindow.hide();
     } else if(store.get('preferMaximized')) {
