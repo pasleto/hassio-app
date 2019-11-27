@@ -1,6 +1,0 @@
-Version 0.2.5
-    - macos touch bar support
-    - can be started hidden, without start at login checked
-    - now supports only trayed window
-    - menu available only on tray icon
-    - known bugs has been repaired

@@ -21,6 +21,7 @@ Features:
   - Start at login
   - Start hidden
   - Start maximized
+  - MacOS touch bar support
 
 Cons:
   - No AutoUpdate the app
