@@ -353,6 +353,3 @@ app.on('window-all-closed', function () {
 app.on('activate', function () {
   if (mainWindow === null) createMainWindow();
 });
-
-
-//TODO try catch for load urls
