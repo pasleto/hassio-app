@@ -19,6 +19,12 @@ Features:
   - Remote URL
   - Tray Icon
   - Start at login
+  - Start hidden
+  - Start maximized
+
+Cons:
+  - No AutoUpdate the app
+    - needs Apple Developer License and Microsoft Developer License in order to work
 
 ---
 
