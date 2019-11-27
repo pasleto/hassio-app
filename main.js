@@ -85,11 +85,11 @@ function createMainWindow () {
   });
   const contextMenuWin = Menu.buildFromTemplate([
     { label: ' Settings', icon: __dirname + '/assets/iconSmall.png', submenu: [
-      { label: 'About ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createAboutWindow() : null) : ((store.get('preferMaximized') ? mainWindow.maximize() : mainWindow.show()),createAboutWindow()) } },
+      { label: 'About ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createAboutWindow() : null) : ((store.get('preferMaximized') ? (mainWindow.maximize(),mainWindow.show()) : mainWindow.show()),createAboutWindow()) } },
       { type: 'separator' },
-      { label: ' Start Options', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createOptionsWindow() : null) : ((store.get('preferMaximized') ? mainWindow.maximize() : mainWindow.show()),createOptionsWindow()) } },
-      { label: ' Change Local URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createLocalUrlWindow() : null) : ((store.get('preferMaximized') ? mainWindow.maximize() : mainWindow.show()),createLocalUrlWindow()) } },
-      { label: ' Change Remote URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createRemoteUrlWindow() : null) : ((store.get('preferMaximized') ? mainWindow.maximize() : mainWindow.show()),createRemoteUrlWindow()) } }
+      { label: ' Start Options', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createOptionsWindow() : null) : ((store.get('preferMaximized') ? (mainWindow.maximize(),mainWindow.show()) : mainWindow.show()),createOptionsWindow()) } },
+      { label: ' Change Local URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createLocalUrlWindow() : null) : ((store.get('preferMaximized') ? (mainWindow.maximize(),mainWindow.show()) : mainWindow.show()),createLocalUrlWindow()) } },
+      { label: ' Change Remote URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createRemoteUrlWindow() : null) : ((store.get('preferMaximized') ? (mainWindow.maximize(),mainWindow.show()) : mainWindow.show()),createRemoteUrlWindow()) } }
     ] },
     { type: 'separator' },
     { label: ' History', icon: __dirname + '/assets/iconSmall.png', submenu: [
@@ -108,12 +108,12 @@ function createMainWindow () {
       { label: ' Remote URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.loadURL(store.get('remoteUrl')) } }
     ]},
     { type: 'separator' },
-    { label: ' Show / Hide ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? mainWindow.hide() : (store.get('preferMaximized') ? mainWindow.maximize() : mainWindow.show()) } },
+    { label: ' Show / Hide ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? mainWindow.hide() : (store.get('preferMaximized') ? (mainWindow.maximize(),mainWindow.show()) : mainWindow.show()) } },
     { type: 'separator' },
     { label: ' Quit ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.close() ;app.quit() } }
   ]);
   const contextMenuMac = Menu.buildFromTemplate([
-    { label: ' Show / Hide ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? mainWindow.hide() : (store.get('preferMaximized') ? mainWindow.maximize() : mainWindow.show()) } },
+    { label: ' Show / Hide ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? mainWindow.hide() : (store.get('preferMaximized') ? (mainWindow.maximize(),mainWindow.show()) : mainWindow.show()) } },
     { type: 'separator' },
     { label: ' Connect to: ', icon: __dirname + '/assets/iconSmall.png', submenu: [
       { label: ' Local URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.loadURL(store.get('localUrl')) } },
@@ -132,11 +132,11 @@ function createMainWindow () {
     ] },
     { type: 'separator' },
     { label: ' Settings', icon: __dirname + '/assets/iconSmall.png', submenu: [
-      { label: 'About ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createAboutWindow() : null) : ((store.get('preferMaximized') ? mainWindow.maximize() : mainWindow.show()),createAboutWindow()) } },
+      { label: 'About ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createAboutWindow() : null) : ((store.get('preferMaximized') ? (mainWindow.maximize(),mainWindow.show()) : mainWindow.show()),createAboutWindow()) } },
       { type: 'separator' },
-      { label: ' Start Options', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createOptionsWindow() : null) : ((store.get('preferMaximized') ? mainWindow.maximize() : mainWindow.show()),createOptionsWindow()) } },
-      { label: ' Change Local URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createLocalUrlWindow() : null) : ((store.get('preferMaximized') ? mainWindow.maximize() : mainWindow.show()),createLocalUrlWindow()) } },
-      { label: ' Change Remote URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createRemoteUrlWindow() : null) : ((store.get('preferMaximized') ? mainWindow.maximize() : mainWindow.show()),createRemoteUrlWindow()) } }
+      { label: ' Start Options', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createOptionsWindow() : null) : ((store.get('preferMaximized') ? (mainWindow.maximize(),mainWindow.show()) : mainWindow.show()),createOptionsWindow()) } },
+      { label: ' Change Local URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createLocalUrlWindow() : null) : ((store.get('preferMaximized') ? (mainWindow.maximize(),mainWindow.show()) : mainWindow.show()),createLocalUrlWindow()) } },
+      { label: ' Change Remote URL', icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.isVisible() ? ((localUrlWindow == null && remoteUrlWindow == null && optionsWindow == null && aboutWindow == null) ? createRemoteUrlWindow() : null) : ((store.get('preferMaximized') ? (mainWindow.maximize(),mainWindow.show()) : mainWindow.show()),createRemoteUrlWindow()) } }
     ] },
     { type: 'separator' },
     { label: ' Quit ' + app.name, icon: __dirname + '/assets/iconSmall.png', click: () => { mainWindow.close(); app.quit() } }
@@ -147,6 +147,7 @@ function createMainWindow () {
   // store.get('startHidden') ? mainWindow.hide() : mainWindow.show();
   if(!store.get('startHidden') && store.get('preferMaximized')) {
     mainWindow.maximize();
+    mainWindow.show();
   }
   if(!store.get('startHidden') && !store.get('preferMaximized')) {
     mainWindow.show();
@@ -160,6 +161,7 @@ function createMainWindow () {
       mainWindow.hide();
     } else if(store.get('preferMaximized')) {
       mainWindow.maximize();
+      mainWindow.show();
     } else {
       mainWindow.show();
     }
