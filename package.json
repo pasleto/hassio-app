@@ -26,8 +26,8 @@
   },
   "scripts": {
     "start": "electron .",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder",
+    "dist-mac": "electron-builder -m",
+    "dist-win": "electron-builder --ia32 --x64 -w",
     "postinstall": "electron-builder install-app-deps"
   },
   "repository": {
